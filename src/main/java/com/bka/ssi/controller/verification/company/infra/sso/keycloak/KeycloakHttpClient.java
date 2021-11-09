@@ -1,13 +1,13 @@
 package com.bka.ssi.controller.verification.company.infra.sso.keycloak;
 
-import com.bka.ssi.controller.verification.company.aop.configuration.sso.SSOConfiguration;
+import com.bka.ssi.controller.verification.company.aop.configuration.security.SSOConfiguration;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthenticatedException;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthorizedException;
 import com.bka.ssi.controller.verification.company.services.security.SSOClient;
+import com.bka.ssi.controller.verification.company.services.utilities.http.RestTemplateFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,16 +23,16 @@ import org.springframework.web.client.RestTemplate;
 public class KeycloakHttpClient implements SSOClient {
 
     private final Logger logger;
-    private final RestTemplate restTemplate;
+    private final RestTemplateFactory restTemplateFactory;
     private final SSOConfiguration configuration;
     private final ObjectMapper mapper;
 
-    public KeycloakHttpClient(Logger logger, RestTemplateBuilder restTemplateBuilder,
-        SSOConfiguration configuration) {
+    public KeycloakHttpClient(Logger logger, SSOConfiguration configuration,
+        RestTemplateFactory restTemplateFactory) {
         this.logger = logger;
-        this.restTemplate = restTemplateBuilder.build();
         this.configuration = configuration;
         this.mapper = new ObjectMapper();
+        this.restTemplateFactory = restTemplateFactory;
     }
 
     public boolean verifyPermission(String token, String transaction) throws Exception {
@@ -54,6 +54,10 @@ public class KeycloakHttpClient implements SSOClient {
             .replace("{realm}", configuration.getRealm());
 
         try {
+            RestTemplate restTemplate =
+                this.restTemplateFactory.create(configuration.isSslTrustAll(),
+                    configuration.isSslVerifyHostname());
+
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
             if (response
@@ -95,6 +99,9 @@ public class KeycloakHttpClient implements SSOClient {
             .replace("{path}", configuration.getVerifyTokenPath())
             .replace("{realm}", configuration.getRealm());
 
+        RestTemplate restTemplate = this.restTemplateFactory.create(configuration.isSslTrustAll(),
+            configuration.isSslVerifyHostname());
+
         ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
         if (response
@@ -108,5 +115,4 @@ public class KeycloakHttpClient implements SSOClient {
 
         return false;
     }
-
 }

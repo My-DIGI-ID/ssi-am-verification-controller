@@ -2,7 +2,7 @@ package com.bka.ssi.controller.verification.company.services.system.accreditatio
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -52,20 +52,12 @@ public class GuestOpenOutputDto {
     private String location;
 
     @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date validFromDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime validFrom;
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date validFromTime;
-
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date validUntilDate;
-
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date validUntilTime;
+    private ZonedDateTime validUntil;
 
     @Size(max = 50)
     private String issuedBy;
@@ -150,36 +142,20 @@ public class GuestOpenOutputDto {
         this.location = location;
     }
 
-    public Date getValidFromDate() {
-        return validFromDate;
+    public ZonedDateTime getValidFrom() {
+        return validFrom;
     }
 
-    public void setValidFromDate(Date validFromDate) {
-        this.validFromDate = validFromDate;
+    public void setValidFrom(ZonedDateTime validFrom) {
+        this.validFrom = validFrom;
     }
 
-    public Date getValidFromTime() {
-        return validFromTime;
+    public ZonedDateTime getValidUntil() {
+        return validUntil;
     }
 
-    public void setValidFromTime(Date validFromTime) {
-        this.validFromTime = validFromTime;
-    }
-
-    public Date getValidUntilDate() {
-        return validUntilDate;
-    }
-
-    public void setValidUntilDate(Date validUntilDate) {
-        this.validUntilDate = validUntilDate;
-    }
-
-    public Date getValidUntilTime() {
-        return validUntilTime;
-    }
-
-    public void setValidUntilTime(Date validUntilTime) {
-        this.validUntilTime = validUntilTime;
+    public void setValidUntil(ZonedDateTime validUntil) {
+        this.validUntil = validUntil;
     }
 
     public String getIssuedBy() {

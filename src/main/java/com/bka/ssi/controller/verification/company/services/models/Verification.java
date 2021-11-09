@@ -1,63 +1,41 @@
 package com.bka.ssi.controller.verification.company.services.models;
 
-import java.util.Date;
-
-import com.bka.ssi.controller.verification.company.services.enums.VerificationState;
+import com.bka.ssi.controller.verification.company.services.enums.VerificationStatus;
 import com.bka.ssi.controller.verification.company.services.models.abstractions.Record;
-import com.bka.ssi.controller.verification.company.services.models.common.BasisId;
-import com.bka.ssi.controller.verification.company.services.models.common.GuestCredential;
 
-public class Verification extends Record {
+public abstract class Verification<T extends VerificationStatus> extends Record {
 
-    private String accreditationId;
+    protected T state;
+
     private String locationId;
     private String terminalId;
     private String threadId;
     private String proofId;
-    
-    private BasisId basisId;
-    private GuestCredential guestCredential;
-    private Date checkOutDateTime;
-    private Date checkInDateTime;
-    private VerificationState state;
     private String proofState;
-    /* TODO - Add proof request attributes */
-    /* TODO - Add proof request predicates */
-    /* TODO - Add flag for verified proof */
-    /* TODO - May need to add identifier to entity */
 
-    public Verification(String id, String accreditationId) {
+    public Verification(String id) {
         super(id);
-        this.accreditationId = accreditationId;
     }
 
-    public Verification( String accreditationId) {
-        super(null);
-        this.accreditationId = accreditationId;
-    }
-
-    public Verification(String threadId, String locationId, String terminalId) {
-        super(null);
-        this.proofId = threadId;
-        this.threadId = threadId;
+    public Verification(String id, String locationId, String terminalId, String threadId,
+        String proofId) {
+        super(id);
         this.locationId = locationId;
         this.terminalId = terminalId;
-    }
-
-    public String getAccreditationId() {
-        return accreditationId;
-    }
-
-    public void setAccreditationId(String accreditationId) {
-        this.accreditationId = accreditationId;
-    }
-
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
+        this.threadId = threadId;
         this.proofId = proofId;
+    }
+
+    public Verification(String id, String locationId, String terminalId, String threadId,
+        String proofId,
+        T state, String proofState) {
+        super(id);
+        this.locationId = locationId;
+        this.terminalId = terminalId;
+        this.threadId = threadId;
+        this.proofId = proofId;
+        this.state = state;
+        this.proofState = proofState;
     }
 
     public String getLocationId() {
@@ -84,68 +62,27 @@ public class Verification extends Record {
         this.threadId = threadId;
     }
 
-	public BasisId getBasisId() {
-		return basisId;
-	}
+    public String getProofId() {
+        return proofId;
+    }
 
-	public void setBasisId(BasisId basisId) {
-		this.basisId = basisId;
-	}
+    public void setProofId(String proofId) {
+        this.proofId = proofId;
+    }
 
-	public GuestCredential getGuestCredential() {
-		return guestCredential;
-	}
+    public T getState() {
+        return state;
+    }
 
-	public void setGuestCredential(GuestCredential guestCredential) {
-		this.guestCredential = guestCredential;
-	}
+    public void setState(T state) {
+        this.state = state;
+    }
 
-	public Date getCheckOutDateTime() {
-		return checkOutDateTime;
-	}
+    public String getProofState() {
+        return proofState;
+    }
 
-	public void setCheckOutDateTime(Date checkOutDateTime) {
-		this.checkOutDateTime = checkOutDateTime;
-	}
-
-	public Date getCheckInDateTime() {
-		return checkInDateTime;
-	}
-
-	public void setCheckInDateTime(Date checkInDateTime) {
-		this.checkInDateTime = checkInDateTime;
-	}
-
-	public VerificationState getState() {
-		return state;
-	}
-
-	public void setState(VerificationState state) {
-		this.state = state;
-	}
-
-	public String getProofState() {
-		return proofState;
-	}
-
-	public void setProofState(String proofState) {
-		this.proofState = proofState;
-	}
-
-    @Override
-    public String toString() {
-        return "Verification{" +
-            "accreditationId='" + accreditationId + '\'' +
-            ", locationId='" + locationId + '\'' +
-            ", terminalId='" + terminalId + '\'' +
-            ", threadId='" + threadId + '\'' +
-            ", proofId='" + proofId + '\'' +
-            ", basisId=" + basisId +
-            ", guestCredential=" + guestCredential +
-            ", checkOutDateTime=" + checkOutDateTime +
-            ", checkInDateTime=" + checkInDateTime +
-            ", state=" + state +
-            ", proofState='" + proofState + '\'' +
-            '}';
+    public void setProofState(String proofState) {
+        this.proofState = proofState;
     }
 }

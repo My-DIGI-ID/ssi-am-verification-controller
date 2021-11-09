@@ -1,25 +1,20 @@
 package com.bka.ssi.controller.verification.company.services;
 
-import com.bka.ssi.controller.verification.company.services.security.facade.ProtectedTransaction;
+import com.bka.ssi.controller.verification.company.services.models.Verification;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.dto.input.ACAPYPresentProofDto;
 
-import java.util.List;
 import java.net.URI;
+import java.util.List;
 
 /* Transaction-Script design */
-public interface VerificationService<T, S, U> {
+public interface VerificationService<T extends Verification> {
 
-    public final static String PERMISSION_RESOURCE_IDENTIFIER = "abstract";
-
-    /* E.g. handles connectionless and connection-oriented proof request without proposal */
-    /* TODO - Remove verificationId if verification is not added manually */
     URI handleProofRequest(String locationId, String terminalId) throws Exception;
 
-    /* TODO - What is passed when proof is received - tbd */
-    void handlePresentationAcknowledged(S proofReceipt) throws Exception;
+    void handlePresentationAcknowledged(ACAPYPresentProofDto proofReceipt) throws Exception;
 
-    /* TODO - What is passed when proof is verified - tbd */
-    void handleProofVerified(U proofVerified) throws Exception;
+    void handleProofVerified(ACAPYPresentProofDto proofVerified) throws Exception;
 
-    List<Object> handleVerificationProcessComplete(String locationId, String terminalId)
+    List<T> handleVerificationProcessComplete(String locationId, String terminalId)
         throws Exception;
 }

@@ -1,8 +1,9 @@
 package com.bka.ssi.controller.verification.company.services.system.accreditation;
 
+import com.bka.ssi.controller.verification.company.services.system.accreditation.dto.output.GuestAccreditationOpenOutputDto;
 import com.bka.ssi.controller.verification.company.services.system.accreditation.dto.output.GuestAccreditationPrivateOutputDto;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 public interface AccreditationClient {
 
@@ -12,10 +13,13 @@ public interface AccreditationClient {
         String lastName,
         String dateOfBirth,
         String companyName,
-        Date validFromDate,
-        Date validUntilDate,
+        ZonedDateTime validFrom,
+        ZonedDateTime validUntil,
         String invitedBy
     ) throws Exception;
 
-    GuestAccreditationPrivateOutputDto cleanupAccreditation(String accreditationId) throws Exception;
+    GuestAccreditationPrivateOutputDto cleanupAccreditation(String accreditationId)
+        throws Exception;
+
+    GuestAccreditationOpenOutputDto revokeAccreditation(String accreditationId) throws Exception;
 }

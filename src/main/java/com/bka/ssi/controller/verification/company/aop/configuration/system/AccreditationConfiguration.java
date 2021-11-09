@@ -9,8 +9,17 @@ public class AccreditationConfiguration {
     @Value("${accreditation.api.url}")
     private String accreditationApiUrl;
 
-    @Value("${accreditation.api.key}")
+    @Value("${accreditation.api.api_key}")
     private String accreditationApiKey;
+
+    @Value("${accreditation.api.api_key_header_name}")
+    private String accreditationApiKeyHeaderName;
+
+    @Value("${accreditation.api.ssl.trust_all}")
+    private boolean sslTrustAll;
+
+    @Value("${accreditation.api.ssl.verify_hostname}")
+    private boolean sslVerifyHostname;
 
     public String getAccreditationApiUrl() {
         return accreditationApiUrl;
@@ -18,5 +27,17 @@ public class AccreditationConfiguration {
 
     public String getAccreditationApiKey() {
         return accreditationApiKey;
+    }
+
+    public String getAccreditationApiKeyHeaderName() {
+        return accreditationApiKeyHeaderName;
+    }
+
+    public boolean getSslTrustAll() {
+        return sslTrustAll;
+    }
+
+    public boolean getSslVerifyHostname() {
+        return sslVerifyHostname;
     }
 }

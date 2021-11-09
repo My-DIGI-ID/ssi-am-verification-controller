@@ -1,7 +1,9 @@
 package com.bka.ssi.controller.verification.company.api.common.rest.controllers;
 
-import com.bka.ssi.controller.verification.company.services.VerificationService;
+import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.dto.input.ACAPYPresentProofDto;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.webhooks.WebhookServiceFactory;
+import com.bka.ssi.controller.verification.company.services.security.facade.APIKeyProtectedTransaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,11 +29,11 @@ public class ACAPYWebhookController {
      */
 
     private final Logger logger;
-    private VerificationService verificationService;
+    private final WebhookServiceFactory webhookServiceFactory;
 
-    public ACAPYWebhookController(Logger logger, VerificationService verificationService) {
+    public ACAPYWebhookController(Logger logger, WebhookServiceFactory webhookServiceFactory) {
         this.logger = logger;
-        this.verificationService = verificationService;
+        this.webhookServiceFactory = webhookServiceFactory;
     }
 
     @Operation(summary = "Pairwise Connection Record Updated")
@@ -41,6 +43,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/connections")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onConnection(
         @RequestBody Object object) throws Exception {
         throw new UnsupportedOperationException("No support planned");
@@ -53,6 +56,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/basicmessages")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onBasicMessage(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -66,6 +70,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/forward")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onForward(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -79,6 +84,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/issue_credential")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onIssueCredential(
         @RequestBody Object object) throws Exception {
         throw new UnsupportedOperationException("No support planned");
@@ -91,34 +97,15 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/present_proof")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onPresentProof(
-        @RequestBody ACAPYPresentProofDto acapyPresentProofDto) throws Exception {
+        @RequestBody ACAPYPresentProofDto inputDto) throws Exception {
         /* In Scope of MVP if verification of Basis-id is done in accreditation controller */
         logger.info("start: onPresentProof");
 
-        logger.info("state: " + acapyPresentProofDto.getState());
+        logger.info("state: " + inputDto.getState());
 
-        switch (acapyPresentProofDto.getState()) {
-            case "proposal_sent":
-            case "proposal_received":
-            case "request_sent":
-            case "request_received":
-            case "presentation_sent":
-            case "presentation_acked":
-                logger.debug("Ignoring PresentProof state: " + acapyPresentProofDto.getState());
-                break;
-            case "presentation_received":
-                logger.debug("PresentProof state: " + acapyPresentProofDto.getState());
-                this.verificationService.handlePresentationAcknowledged(acapyPresentProofDto);
-                break;
-            case "verified":
-                logger.debug("PresentProof state: " + acapyPresentProofDto.getState());
-                this.verificationService.handleProofVerified(acapyPresentProofDto);
-                break;
-            default:
-                logger.debug("Unknown PresentProof state: " + acapyPresentProofDto.getState());
-                break;
-        }
+        this.webhookServiceFactory.handleOnPresentProof(inputDto);
 
         logger.info("end: onPresentProof");
         return ResponseEntity.noContent().build();
@@ -131,6 +118,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/oob_invitation")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onOutOfBandInvitation(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -144,6 +132,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/ping")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onPing(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -157,6 +146,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/issuer_cred_rev")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onIssuerCredRev(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -170,6 +160,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/revocation_registry")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onRevocationRegistry(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */
@@ -183,6 +174,7 @@ public class ACAPYWebhookController {
             content = @Content)
     })
     @PostMapping("/problem_report")
+    @APIKeyProtectedTransaction(id = ACAPYConfiguration.API_KEY_ID)
     public ResponseEntity<Void> onProblemReport(
         @RequestBody Object object) throws Exception {
         /* Out of Scope for MVP and beyond */

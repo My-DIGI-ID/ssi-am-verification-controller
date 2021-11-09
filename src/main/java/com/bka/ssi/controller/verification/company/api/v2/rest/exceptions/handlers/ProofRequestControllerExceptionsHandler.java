@@ -1,11 +1,13 @@
 package com.bka.ssi.controller.verification.company.api.v2.rest.exceptions.handlers;
 
+import com.bka.ssi.controller.verification.company.api.common.exceptions.LogOutput;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.RestErrorResponse;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.factories.RestErrorResponseFactory;
 import com.bka.ssi.controller.verification.company.api.v1.rest.controllers.ProofRequestController;
 import com.bka.ssi.controller.verification.company.infra.db.mongo.exceptions.InfrastructureException;
 import com.bka.ssi.controller.verification.company.services.exceptions.ScriptException;
 import com.bka.ssi.controller.verification.company.services.exceptions.ServiceException;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -22,10 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 public class ProofRequestControllerExceptionsHandler {
 
     private final RestErrorResponseFactory restErrorResponseFactory;
+    private final Logger logger;
 
     public ProofRequestControllerExceptionsHandler(
-        RestErrorResponseFactory restErrorResponseFactory) {
+        RestErrorResponseFactory restErrorResponseFactory, Logger logger) {
         this.restErrorResponseFactory = restErrorResponseFactory;
+        this.logger = logger;
     }
 
     @ExceptionHandler(ServiceException.class)
@@ -36,15 +40,14 @@ public class ProofRequestControllerExceptionsHandler {
         ServiceException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.service_exception_placeholder",
             HttpStatus.BAD_REQUEST,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -56,15 +59,14 @@ public class ProofRequestControllerExceptionsHandler {
         ScriptException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.script_exception_placeholder",
             HttpStatus.BAD_REQUEST,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -76,15 +78,14 @@ public class ProofRequestControllerExceptionsHandler {
         InfrastructureException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.infrastructure_exception_placeholder",
             HttpStatus.BAD_REQUEST,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

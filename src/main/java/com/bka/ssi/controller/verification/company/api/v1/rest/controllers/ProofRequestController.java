@@ -1,6 +1,6 @@
 package com.bka.ssi.controller.verification.company.api.v1.rest.controllers;
 
-import com.bka.ssi.controller.verification.company.services.VerificationService;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.GuestVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,10 +24,10 @@ public class ProofRequestController {
 
     /* TODO - VerificationService beans in a @Configuration class in order to instantiate via
         Autowired if multiple implementations available */
-    private final VerificationService verificationService;
+    private final GuestVerificationService verificationService;
     private final Logger logger;
 
-    ProofRequestController(VerificationService verificationService,
+    ProofRequestController(GuestVerificationService verificationService,
         Logger logger) {
         this.verificationService = verificationService;
         this.logger = logger;

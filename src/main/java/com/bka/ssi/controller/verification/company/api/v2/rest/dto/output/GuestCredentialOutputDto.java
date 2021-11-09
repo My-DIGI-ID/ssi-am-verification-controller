@@ -2,9 +2,9 @@ package com.bka.ssi.controller.verification.company.api.v2.rest.dto.output;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.ZonedDateTime;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 public class GuestCredentialOutputDto {
 
@@ -45,20 +45,12 @@ public class GuestCredentialOutputDto {
     private String location;
 
     @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date validFromDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime validFrom;
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date validFromTime;
-
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date validUntilDate;
-
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date validUntilTime;
+    private ZonedDateTime validUntil;
 
     @Size(max = 50)
     @NotNull
@@ -116,12 +108,12 @@ public class GuestCredentialOutputDto {
         this.lastName = lastName;
     }
 
-    public String getTitel() {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitel(String titel) {
-        this.title = titel;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getEmail() {
@@ -172,36 +164,20 @@ public class GuestCredentialOutputDto {
         this.location = location;
     }
 
-    public Date getValidFromDate() {
-        return validFromDate;
+    public ZonedDateTime getValidFrom() {
+        return validFrom;
     }
 
-    public void setValidFromDate(Date validFromDate) {
-        this.validFromDate = validFromDate;
+    public void setValidFrom(ZonedDateTime validFrom) {
+        this.validFrom = validFrom;
     }
 
-    public Date getValidFromTime() {
-        return validFromTime;
+    public ZonedDateTime getValidUntil() {
+        return validUntil;
     }
 
-    public void setValidFromTime(Date validFromTime) {
-        this.validFromTime = validFromTime;
-    }
-
-    public Date getValidUntilDate() {
-        return validUntilDate;
-    }
-
-    public void setValidUntilDate(Date validUntilDate) {
-        this.validUntilDate = validUntilDate;
-    }
-
-    public Date getValidUntilTime() {
-        return validUntilTime;
-    }
-
-    public void setValidUntilTime(Date validUntilTime) {
-        this.validUntilTime = validUntilTime;
+    public void setValidUntil(ZonedDateTime validUntil) {
+        this.validUntil = validUntil;
     }
 
     public String getInvitedBy() {

@@ -17,7 +17,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class AuthorizationServiceTest {
 
     private static final String validToken = "token";
-    private static final String invalidToken = "";
+    private static final String invalidToken = "invalidToken";
     private static final String authorizedCondition = "validCondition";
     private static final String unauthorizedCondition = "invalidCondition";
 
@@ -49,7 +49,7 @@ public class AuthorizationServiceTest {
         AuthorizationService authenticationService = new AuthorizationService(client, logger);
 
         // then
-        assertTrue(authenticationService.verifyPermission(validToken, authorizedCondition));
+        assertTrue(authenticationService.verifySSOPermission(validToken, authorizedCondition));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class AuthorizationServiceTest {
 
         // then
         assertThrows(UnauthorizedException.class, () -> {
-            authenticationService.verifyPermission(validToken, unauthorizedCondition);
+            authenticationService.verifySSOPermission(validToken, unauthorizedCondition);
         });
     }
 
@@ -81,7 +81,7 @@ public class AuthorizationServiceTest {
 
         // then
         assertThrows(HttpClientErrorException.Forbidden.class, () -> {
-            authenticationService.verifyPermission(validToken, unauthorizedCondition);
+            authenticationService.verifySSOPermission(validToken, unauthorizedCondition);
         });
     }
 
@@ -97,9 +97,7 @@ public class AuthorizationServiceTest {
 
         // then
         assertThrows(HttpClientErrorException.Unauthorized.class, () -> {
-            authenticationService.verifyPermission(invalidToken, authorizedCondition);
+            authenticationService.verifySSOPermission(invalidToken, authorizedCondition);
         });
     }
-
-
 }

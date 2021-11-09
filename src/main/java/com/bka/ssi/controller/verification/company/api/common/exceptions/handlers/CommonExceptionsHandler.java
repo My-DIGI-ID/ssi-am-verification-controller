@@ -1,16 +1,18 @@
 package com.bka.ssi.controller.verification.company.api.common.exceptions.handlers;
 
+import com.bka.ssi.controller.verification.company.api.common.exceptions.LogOutput;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.RestErrorResponse;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.factories.RestErrorResponseFactory;
+import com.bka.ssi.controller.verification.company.services.exceptions.NotFoundException;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthenticatedException;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthorizedException;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.lang.reflect.InvocationTargetException;
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,9 +21,12 @@ import javax.servlet.http.HttpServletRequest;
 public class CommonExceptionsHandler {
 
     private final RestErrorResponseFactory restErrorResponseFactory;
+    private final Logger logger;
 
-    public CommonExceptionsHandler(RestErrorResponseFactory restErrorResponseFactory) {
+    public CommonExceptionsHandler(RestErrorResponseFactory restErrorResponseFactory,
+        Logger logger) {
         this.restErrorResponseFactory = restErrorResponseFactory;
+        this.logger = logger;
     }
 
     @ExceptionHandler(UnsupportedOperationException.class)
@@ -30,15 +35,14 @@ public class CommonExceptionsHandler {
         UnsupportedOperationException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.not_implemented_exception_placeholder",
             HttpStatus.NOT_IMPLEMENTED,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -48,15 +52,14 @@ public class CommonExceptionsHandler {
         UnauthorizedException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.unauthorized_exception_placeholder",
             HttpStatus.FORBIDDEN,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
@@ -66,25 +69,21 @@ public class CommonExceptionsHandler {
         UnauthenticatedException ex,
         HttpServletRequest request
     ) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
-
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.unauthorized_exception_placeholder",
             HttpStatus.UNAUTHORIZED,
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler({Exception.class, InvocationTargetException.class,
-        IllegalAccessException.class, NoSuchMethodException.class})
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<RestErrorResponse> handleUnknownException(Exception ex,
         HttpServletRequest request) {
-        /* TODO - BKAACMGT-73 - Log internal error, remove ex.printStackTrace() */
-        ex.printStackTrace();
 
         RestErrorResponse response = restErrorResponseFactory.create(
             "message.common.rest.error.unknown_exception_placeholder",
@@ -92,7 +91,22 @@ public class CommonExceptionsHandler {
             request
         );
 
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<RestErrorResponse> handleNotFoundException(NotFoundException ex,
+        HttpServletRequest request) {
+
+        RestErrorResponse response = restErrorResponseFactory.create(
+            "message.common.rest.error.not_found_exception_placeholder",
+            HttpStatus.NOT_FOUND, request);
+
+        logger.debug(ex.getMessage());
+        logger.error(new LogOutput(response).toString());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }

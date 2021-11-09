@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bka.ssi.controller.verification.company.aop.configuration.sso.SSOConfiguration;
-import com.bka.ssi.controller.verification.company.services.exceptions.UnauthenticatedException;
+import com.bka.ssi.controller.verification.company.aop.configuration.security.SSOConfiguration;
 import com.bka.ssi.controller.verification.company.infra.sso.keycloak.KeycloakHttpClient;
+import com.bka.ssi.controller.verification.company.services.exceptions.RestTemplateFactorySSLException;
+import com.bka.ssi.controller.verification.company.services.exceptions.UnauthenticatedException;
+import com.bka.ssi.controller.verification.company.services.utilities.http.RestTemplateFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +17,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.web.client.HttpClientErrorException;
@@ -27,8 +29,9 @@ import org.springframework.web.client.RestTemplate;
 
 
 @ActiveProfiles("unittest")
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class,
-    classes = {SSOConfiguration.class})
+@TestPropertySource("classpath:application-unittest.properties")
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {
+    SSOConfiguration.class})
 @ExtendWith(SpringExtension.class)
 public class KeyCloakHttpClientTest {
 
@@ -49,13 +52,13 @@ public class KeyCloakHttpClientTest {
     private KeycloakHttpClient httpClient;
 
     @BeforeEach
-    public void init() {
+    public void init() throws RestTemplateFactorySSLException {
         MockitoAnnotations.openMocks(this);
-        RestTemplateBuilder r = Mockito.mock(RestTemplateBuilder.class);
+        RestTemplateFactory restTemplateFactory = Mockito.mock(RestTemplateFactory.class);
         Mockito
-            .when(r.build())
+            .when(restTemplateFactory.create(Mockito.anyBoolean(), Mockito.anyBoolean()))
             .thenReturn(restTemplate);
-        httpClient = new KeycloakHttpClient(logger, r, configuration);
+        httpClient = new KeycloakHttpClient(logger, configuration, restTemplateFactory);
     }
 
     @Test
@@ -140,7 +143,6 @@ public class KeyCloakHttpClientTest {
         assertFalse(isValid);
     }
 
-
     @Test
     public void shouldThrowWhenUnauthenticated() {
         // Given negative response from keycloak (user not authenticated)
@@ -159,5 +161,4 @@ public class KeyCloakHttpClientTest {
             httpClient.verifyPermission(token, authorizedCondition);
         });
     }
-
 }
