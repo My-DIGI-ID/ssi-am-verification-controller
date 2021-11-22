@@ -17,6 +17,12 @@ public abstract class Verification<T extends VerificationStatus> extends Record 
         super(id);
     }
 
+    public Verification(String locationId, String terminalId) {
+        super(null);
+        this.locationId = locationId;
+        this.terminalId = terminalId;
+    }
+
     public Verification(String id, String locationId, String terminalId, String threadId,
         String proofId) {
         super(id);

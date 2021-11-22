@@ -8,6 +8,7 @@ import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAP
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration;
 import com.bka.ssi.controller.verification.company.services.VerificationService;
 import com.bka.ssi.controller.verification.company.services.enums.GuestVerificationStatus;
+import com.bka.ssi.controller.verification.company.services.exceptions.InvalidVerificationStateChangeException;
 import com.bka.ssi.controller.verification.company.services.exceptions.NotFoundException;
 import com.bka.ssi.controller.verification.company.services.models.GuestVerification;
 import com.bka.ssi.controller.verification.company.services.models.common.BasisId;
@@ -220,6 +221,40 @@ public class GuestVerificationService
     public List<GuestVerification> handleVerificationProcessComplete(String locationId,
         String terminalId) {
         return this.repository.findAllByLocationIdAndTerminalId(locationId, terminalId);
+    }
+
+    public GuestVerification checkout(String verificationId) throws Exception {
+        GuestVerification previousVerification =
+            this.repository.findById(verificationId).orElseThrow(NotFoundException::new);
+
+        if (previousVerification.getState() != GuestVerificationStatus.CHECK_IN) {
+            throw new InvalidVerificationStateChangeException(
+                "Expected CHECK_IN but was " + previousVerification.getState());
+        }
+
+        GuestVerification verification =
+            new GuestVerification(previousVerification.getLocationId(),
+                previousVerification.getTerminalId());
+
+        verification.setBasisId(previousVerification.getBasisId());
+        verification.setGuestCredential(previousVerification.getGuestCredential());
+
+        verification.setAccreditationId(previousVerification.getAccreditationId());
+
+        verification.setCheckInDateTime(previousVerification.getCheckInDateTime());
+        verification.setCheckOutDateTime(ZonedDateTime.now());
+
+        verification.setState(GuestVerificationStatus.CHECK_OUT);
+
+        GuestVerification savedVerification = this.repository.save(verification);
+
+        this.accreditationClient.revokeAccreditation(verification.getAccreditationId());
+
+        this.accreditationClient.cleanupAccreditation(verification.getAccreditationId());
+
+        this.repository.deleteById(previousVerification.getId());
+
+        return savedVerification;
     }
 
     private boolean validateTimeframe(GuestCredential guestCredential) {

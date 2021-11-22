@@ -89,14 +89,6 @@ public class GuestVerificationMongoDbMapper {
         if (document == null) {
             return null;
         } else {
-            GuestVerification verification = new GuestVerification(document.getId(),
-                document.getAccreditationId());
-
-            verification.setProofId(document.getProofId());
-            verification.setThreadId(document.getThreadId());
-            verification.setLocationId(document.getLocationId());
-            verification.setTerminalId(document.getTerminalId());
-
             BasisId basisId = new BasisId();
             if (document.getBasisIdDbValue() != null) {
                 basisId.setFirstName(document.getBasisIdDbValue().getFirstName());
@@ -104,7 +96,6 @@ public class GuestVerificationMongoDbMapper {
                 basisId.setDateOfBirth(document.getBasisIdDbValue().getDateOfBirth());
                 basisId.setDateOfExpiry(document.getBasisIdDbValue().getDateOfExpiry());
             }
-            verification.setBasisId(basisId);
 
             GuestCredential guestCredential = new GuestCredential();
             if (document.getGuestCredentialDbValue() != null) {
@@ -146,12 +137,19 @@ public class GuestVerificationMongoDbMapper {
                     document.getGuestCredentialDbValue().getDataEncryptionAlgorithm());
 
             }
-            verification.setGuestCredential(guestCredential);
 
-            verification.setCheckOutDateTime(document.getCheckOutDateTime());
-            verification.setCheckInDateTime(document.getCheckInDateTime());
-            verification.setState(GuestVerificationStatus.valueOf(document.getState()));
-            verification.setProofState(document.getProofState());
+            GuestVerification verification = new GuestVerification(document.getId(),
+                document.getAccreditationId(),
+                document.getLocationId(),
+                document.getTerminalId(),
+                document.getThreadId(),
+                document.getProofId(),
+                basisId,
+                guestCredential,
+                document.getCheckInDateTime(),
+                document.getCheckOutDateTime(),
+                GuestVerificationStatus.valueOf(document.getState()),
+                document.getProofState());
 
             return verification;
         }

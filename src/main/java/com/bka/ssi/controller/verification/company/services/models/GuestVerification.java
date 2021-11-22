@@ -14,9 +14,8 @@ public class GuestVerification extends Verification<GuestVerificationStatus> {
     private ZonedDateTime checkOutDateTime;
     private ZonedDateTime checkInDateTime;
 
-    public GuestVerification(String id, String accreditationId) {
-        super(id);
-        this.accreditationId = accreditationId;
+    public GuestVerification(String locationId, String terminalId) {
+        super(locationId, terminalId);
         this.state = GuestVerificationStatus.PENDING;
     }
 
@@ -34,8 +33,8 @@ public class GuestVerification extends Verification<GuestVerificationStatus> {
     public GuestVerification(String id, String accreditationId, String locationId,
         String terminalId, String threadId, String proofId,
         BasisId basisId,
-        GuestCredential guestCredential, ZonedDateTime checkOutDateTime,
-        ZonedDateTime checkInDateTime,
+        GuestCredential guestCredential, ZonedDateTime checkInDateTime,
+        ZonedDateTime checkOutDateTime,
         GuestVerificationStatus state, String proofState) {
         super(id, locationId, terminalId, threadId, proofId, state, proofState);
         this.accreditationId = accreditationId;

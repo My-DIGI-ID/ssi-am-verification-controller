@@ -69,11 +69,11 @@ import com.bka.ssi.controller.verification.company.services.models.common.ProofR
 import com.bka.ssi.controller.verification.company.services.models.common.RequestPresentationAttach;
 import com.bka.ssi.controller.verification.company.services.models.credentials.EmployeeCredential;
 import com.bka.ssi.controller.verification.company.services.models.credentials.GuestCredential;
+import com.bka.ssi.controller.verification.company.services.utilities.NonceGenerator;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
-import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -89,13 +89,11 @@ public class ACAPYUtilities {
 
     private final CredentialsConfiguration credentialsConfiguration;
     private final ACAPYConfiguration acapyConfiguration;
-    private final SecureRandom secureRandom;
 
     private ACAPYUtilities(CredentialsConfiguration credentialsConfiguration,
         ACAPYConfiguration acapyConfiguration) {
         this.credentialsConfiguration = credentialsConfiguration;
         this.acapyConfiguration = acapyConfiguration;
-        this.secureRandom = new SecureRandom();
     }
 
     public V10PresentationCreateRequestRequest createPresentationRequest(String comment,
@@ -104,7 +102,7 @@ public class ACAPYUtilities {
         throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 
         // Create nonce
-        String nonce = String.valueOf(secureRandom.nextInt());
+        String nonce = String.valueOf(NonceGenerator.nextPositiveInt());
 
         V10PresentationCreateRequestRequest presentationCreateRequestRequest =
             new V10PresentationCreateRequestRequest();

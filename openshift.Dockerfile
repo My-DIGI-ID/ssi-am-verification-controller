@@ -24,7 +24,7 @@ WORKDIR /app
 RUN mkdir -p /app/resources/i18n/ui
 
 COPY --from=MAVEN_BUILD /build/target/verification.company-0.0.1-SNAPSHOT.jar /app/
-COPY --from=MAVEN_BUILD /build/src/main/resources//i18n/ui/* /app/resources/i18n/ui/
+COPY --from=MAVEN_BUILD /build/src/main/resources/i18n/ui/* /app/resources/i18n/ui/
 
 # PDB - For OpenShift - nothing runs with ROOT 
 RUN chmod 777 -R /app && chmod 777 -R /app/* 
