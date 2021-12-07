@@ -5,7 +5,9 @@ public enum GuestVerificationStatus implements VerificationStatus {
     CHECK_IN("CHECK_IN"),
     CHECK_OUT("CHECK_OUT"),
     FAIL_DATE_TIME("FAIL_DATE_TIME"),
-    FAIL_VERIFY_CREDENTIAL("FAIL_VERIFY_CREDENTIAL");
+    FAIL_VERIFY_CREDENTIAL("FAIL_VERIFY_CREDENTIAL"),
+    FAIL_LOCATION("FAIL_LOCATION"),
+    TIMEOUT("TIMEOUT");
 
     private final String name;
 

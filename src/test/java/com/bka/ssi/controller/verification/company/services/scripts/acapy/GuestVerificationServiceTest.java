@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bka.ssi.controller.verification.acapy_client.api.PresentProofV10Api;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration;
 import com.bka.ssi.controller.verification.company.services.enums.GuestVerificationStatus;
@@ -13,17 +12,24 @@ import com.bka.ssi.controller.verification.company.services.models.GuestVerifica
 import com.bka.ssi.controller.verification.company.services.models.common.BasisId;
 import com.bka.ssi.controller.verification.company.services.models.credentials.GuestCredential;
 import com.bka.ssi.controller.verification.company.services.repositories.GuestVerificationRepository;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.dto.input.ACAPYPresentProofDto;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.tasks.GuestThreadPoolTaskScheduler;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYConnectionlessProofUtility;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYUtilities;
 import com.bka.ssi.controller.verification.company.services.system.accreditation.AccreditationClient;
+import com.bka.ssi.controller.verification.company.testutilities.GuestVerificationBuilder;
+import io.github.my_digi_id.acapy_client.api.PresentProofV10Api;
+import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -53,6 +59,9 @@ public class GuestVerificationServiceTest {
     @Mock
     private PresentProofV10Api presentProofV10Api;
 
+    @Mock
+    private GuestThreadPoolTaskScheduler guestTaskScheduler;
+
     @InjectMocks
     private GuestVerificationService guestVerificationService;
 
@@ -62,35 +71,58 @@ public class GuestVerificationServiceTest {
     private GuestVerification checkedInVerification;
     private GuestVerification pendingVerification;
 
+    private ACAPYPresentProofDto acapyPresentProofDto;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        basisId = new BasisId();
-        basisId.setFirstName("John");
-        basisId.setFamilyName("Doe");
-        basisId.setDateOfBirth("05/05/1980");
-        basisId.setDateOfExpiry("01/01/2025");
+        GuestVerificationBuilder guestVerificationBuilder = new GuestVerificationBuilder();
 
-        guestCredential = new GuestCredential();
-        guestCredential.setFirstName("John");
-        guestCredential.setLastName("Doe");
+        checkedInVerification = guestVerificationBuilder.buildCheckInVerification();
+        basisId = checkedInVerification.getBasisId();
+        guestCredential = checkedInVerification.getGuestCredential();
 
-        checkedInVerification = new GuestVerification("12345");
-        checkedInVerification.setBasisId(basisId);
-        checkedInVerification.setGuestCredential(guestCredential);
-        checkedInVerification.setAccreditationId("67890");
-        checkedInVerification.setState(GuestVerificationStatus.CHECK_IN);
-        checkedInVerification.setCheckInDateTime(ZonedDateTime.now());
-        checkedInVerification.setLocationId("123");
-        checkedInVerification.setThreadId("456");
+        guestVerificationBuilder.reset();
+        pendingVerification = guestVerificationBuilder.buildPendingVerification();
 
-        pendingVerification = new GuestVerification("12346");
-        pendingVerification.setState(GuestVerificationStatus.PENDING);
+        acapyPresentProofDto = new ACAPYPresentProofDto("12345", "23456", "verified");
 
         guestVerificationService = new GuestVerificationService(acapyConnectionlessProofUtility,
             logger, acapyConfiguration, accreditationClient, repository, credentialsConfiguration
-            , acapyUtilities);
+            , acapyUtilities, guestTaskScheduler);
+        ReflectionTestUtils.setField(guestVerificationService, "presentProofApi",
+            presentProofV10Api);
+    }
+
+    @Test
+    void handleProofVerifiedFailLocation() throws Exception {
+
+        checkedInVerification.setLocationId("234");
+
+        V10PresentationExchange presentationExchange = new V10PresentationExchange();
+        presentationExchange.setVerified(V10PresentationExchange.VerifiedEnum.TRUE);
+
+        Mockito.when(repository.findByThreadId(acapyPresentProofDto.getThreadId()))
+            .thenReturn(Optional.of(checkedInVerification));
+
+        Mockito.when(presentProofV10Api.presentProofRecordsPresExIdGet(
+                acapyPresentProofDto.getPresentationExchangeId()))
+            .thenReturn(presentationExchange);
+
+        Mockito.when(acapyUtilities.getBasisId(Mockito.any())).thenReturn(basisId);
+        Mockito.when(acapyUtilities.getGuestCredential(Mockito.any())).thenReturn(guestCredential);
+
+        Mockito.when(acapyConfiguration.getBasisIdVerificationDevMode()).thenReturn(false);
+
+        guestVerificationService.handleProofVerified(acapyPresentProofDto);
+
+        ArgumentCaptor<GuestVerification> argumentCaptor =
+            ArgumentCaptor.forClass(GuestVerification.class);
+        Mockito.verify(repository).save(argumentCaptor.capture());
+
+        GuestVerification savedVerification = argumentCaptor.getValue();
+        assertEquals(GuestVerificationStatus.FAIL_LOCATION, savedVerification.getState());
     }
 
     @Test

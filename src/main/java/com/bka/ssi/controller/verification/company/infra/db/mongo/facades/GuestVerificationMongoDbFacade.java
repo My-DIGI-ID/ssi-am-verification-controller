@@ -111,6 +111,11 @@ public class GuestVerificationMongoDbFacade implements GuestVerificationReposito
         Optional<GuestVerificationMongoDbDocument> document =
             repository.findByAccreditationId(accreditationId);
 
+        if (document.isEmpty()){
+            logger.debug("No verification found for this accreditation");
+            return Optional.ofNullable(null);
+        }
+        logger.debug("Verification found for this accreditation");
         GuestVerification verification = mapper.documentToEntity(document.get());
 
         return Optional.of(verification);

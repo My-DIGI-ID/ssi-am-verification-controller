@@ -72,10 +72,6 @@ public class GuestVerification extends Verification<GuestVerificationStatus> {
         return checkOutDateTime;
     }
 
-    public void setCheckOutDateTime(ZonedDateTime checkOutDateTime) {
-        this.checkOutDateTime = checkOutDateTime;
-    }
-
     public ZonedDateTime getCheckInDateTime() {
         return checkInDateTime;
     }
@@ -84,6 +80,15 @@ public class GuestVerification extends Verification<GuestVerificationStatus> {
         this.checkInDateTime = checkInDateTime;
     }
 
+    public void checkIn() {
+        this.checkInDateTime = ZonedDateTime.now();
+        this.state = GuestVerificationStatus.CHECK_IN;
+    }
+
+    public void checkOut() {
+        this.checkOutDateTime = ZonedDateTime.now();
+        this.state = GuestVerificationStatus.CHECK_OUT;
+    }
 
     @Override
     public String toString() {

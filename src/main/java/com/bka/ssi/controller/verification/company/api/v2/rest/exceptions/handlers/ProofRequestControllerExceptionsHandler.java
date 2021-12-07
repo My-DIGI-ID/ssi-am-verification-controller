@@ -1,6 +1,6 @@
 package com.bka.ssi.controller.verification.company.api.v2.rest.exceptions.handlers;
 
-import com.bka.ssi.controller.verification.company.api.common.exceptions.LogOutput;
+import com.bka.ssi.controller.verification.company.aop.logging.LoggingUtility;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.RestErrorResponse;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.factories.RestErrorResponseFactory;
 import com.bka.ssi.controller.verification.company.api.v1.rest.controllers.ProofRequestController;
@@ -46,8 +46,7 @@ public class ProofRequestControllerExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -65,8 +64,7 @@ public class ProofRequestControllerExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -84,8 +82,7 @@ public class ProofRequestControllerExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

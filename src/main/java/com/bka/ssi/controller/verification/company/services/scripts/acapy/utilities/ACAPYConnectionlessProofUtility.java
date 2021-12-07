@@ -1,21 +1,18 @@
 package com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities;
 
-import com.bka.ssi.controller.verification.acapy_client.api.CredentialDefinitionApi;
-import com.bka.ssi.controller.verification.acapy_client.api.PresentProofV10Api;
-import com.bka.ssi.controller.verification.acapy_client.api.SchemaApi;
-import com.bka.ssi.controller.verification.acapy_client.invoker.ApiException;
-import com.bka.ssi.controller.verification.acapy_client.model.CredentialDefinition;
-import com.bka.ssi.controller.verification.acapy_client.model.Schema;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationCreateRequestRequest;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationExchange;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.services.exceptions.ScriptException;
 import com.bka.ssi.controller.verification.company.services.scripts.ProofUtility;
-import org.springframework.stereotype.Service;
-
+import io.github.my_digi_id.acapy_client.api.CredentialDefinitionApi;
+import io.github.my_digi_id.acapy_client.api.PresentProofV10Api;
+import io.github.my_digi_id.acapy_client.api.SchemaApi;
+import io.github.my_digi_id.acapy_client.invoker.ApiException;
+import io.github.my_digi_id.acapy_client.model.CredentialDefinition;
+import io.github.my_digi_id.acapy_client.model.Schema;
+import io.github.my_digi_id.acapy_client.model.V10PresentationCreateRequestRequest;
+import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 import org.slf4j.Logger;
-
-import java.net.URI;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ACAPYConnectionlessProofUtility implements

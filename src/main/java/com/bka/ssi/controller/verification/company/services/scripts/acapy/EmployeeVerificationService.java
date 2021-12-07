@@ -1,8 +1,5 @@
 package com.bka.ssi.controller.verification.company.services.scripts.acapy;
 
-import com.bka.ssi.controller.verification.acapy_client.api.PresentProofV10Api;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationCreateRequestRequest;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationExchange;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration;
 import com.bka.ssi.controller.verification.company.services.VerificationService;
@@ -16,6 +13,9 @@ import com.bka.ssi.controller.verification.company.services.scripts.acapy.dto.in
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYConnectionlessProofUtility;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.my_digi_id.acapy_client.api.PresentProofV10Api;
+import io.github.my_digi_id.acapy_client.model.V10PresentationCreateRequestRequest;
+import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

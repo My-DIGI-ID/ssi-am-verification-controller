@@ -107,7 +107,7 @@
         <appender-ref ref="Console"/>
     </root>
 
-    <logger name="com.bka.ssi.controller.accreditation" level="debug">
+    <logger name="com.bka.ssi.controller.verification" level="debug">
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="DebugRollingFile"/>
     </logger>

@@ -52,6 +52,15 @@ public class ACAPYPresentProofDto {
     @JsonProperty("error_msg")
     private String errorMessage;
 
+    public ACAPYPresentProofDto() {
+    }
+
+    public ACAPYPresentProofDto(String presentationExchangeId, String threadId, String state) {
+        this.presentationExchangeId = presentationExchangeId;
+        this.threadId = threadId;
+        this.state = state;
+    }
+
     public String getPresentationExchangeId() {
         return presentationExchangeId;
     }

@@ -25,6 +25,40 @@ public class GuestCredential {
     private String companyProofOfOwnership;
     private String dataEncryptionAlgorithm;
 
+    public GuestCredential() {
+    }
+
+    public GuestCredential(String firstName, String lastName, String title, String email,
+        String primaryPhoneNumber, String secondaryPhoneNumber,
+        String companyName, String typeOfVisit, String location,
+        ZonedDateTime validFrom, ZonedDateTime validUntil,
+        String invitedBy, String dateOfBirth, String licensePlateNumber,
+        String companyCity, String companyStreet, String companyPostCode,
+        String referenceBasisId, String referenceEmployeeId,
+        String companyProofOfOwnership, String dataEncryptionAlgorithm) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.title = title;
+        this.email = email;
+        this.primaryPhoneNumber = primaryPhoneNumber;
+        this.secondaryPhoneNumber = secondaryPhoneNumber;
+        this.companyName = companyName;
+        this.typeOfVisit = typeOfVisit;
+        this.location = location;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.invitedBy = invitedBy;
+        this.dateOfBirth = dateOfBirth;
+        this.licensePlateNumber = licensePlateNumber;
+        this.companyCity = companyCity;
+        this.companyStreet = companyStreet;
+        this.companyPostCode = companyPostCode;
+        this.referenceBasisId = referenceBasisId;
+        this.referenceEmployeeId = referenceEmployeeId;
+        this.companyProofOfOwnership = companyProofOfOwnership;
+        this.dataEncryptionAlgorithm = dataEncryptionAlgorithm;
+    }
+
     public String getFirstName() {
         return firstName;
     }

@@ -45,12 +45,6 @@ import static com.bka.ssi.controller.verification.company.aop.configuration.agen
 import static com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration.GUEST_CRED_VALID_FROM;
 import static com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration.GUEST_CRED_VALID_UNTIL;
 
-import com.bka.ssi.controller.verification.acapy_client.model.IndyProofReqAttrSpec;
-import com.bka.ssi.controller.verification.acapy_client.model.IndyProofRequest;
-import com.bka.ssi.controller.verification.acapy_client.model.IndyProofRequestedProofRevealedAttrGroup;
-import com.bka.ssi.controller.verification.acapy_client.model.RawEncoded;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationCreateRequestRequest;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationExchange;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration;
 import com.bka.ssi.controller.verification.company.services.models.common.Address;
@@ -70,6 +64,13 @@ import com.bka.ssi.controller.verification.company.services.models.common.Reques
 import com.bka.ssi.controller.verification.company.services.models.credentials.EmployeeCredential;
 import com.bka.ssi.controller.verification.company.services.models.credentials.GuestCredential;
 import com.bka.ssi.controller.verification.company.services.utilities.NonceGenerator;
+import io.github.my_digi_id.acapy_client.model.IndyProofReqAttrSpec;
+import io.github.my_digi_id.acapy_client.model.IndyProofRequest;
+import io.github.my_digi_id.acapy_client.model.IndyProofRequestNonRevoked;
+import io.github.my_digi_id.acapy_client.model.IndyProofRequestedProofRevealedAttrGroup;
+import io.github.my_digi_id.acapy_client.model.RawEncoded;
+import io.github.my_digi_id.acapy_client.model.V10PresentationCreateRequestRequest;
+import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -77,6 +78,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -110,12 +112,17 @@ public class ACAPYUtilities {
         presentationCreateRequestRequest.setComment(comment);
         presentationCreateRequestRequest.setTrace(trace);
 
+        IndyProofRequestNonRevoked indyProofRequestNonRevoked = new IndyProofRequestNonRevoked();
+        indyProofRequestNonRevoked.from(0);
+        indyProofRequestNonRevoked.to((int) Instant.now().getEpochSecond());
+
         IndyProofRequest indyProofRequest = new IndyProofRequest();
         indyProofRequest.setName(name);
         indyProofRequest.setNonce(nonce);
         indyProofRequest.setVersion("1.0");
         indyProofRequest.setRequestedAttributes(new HashMap<>());
         indyProofRequest.setRequestedPredicates(new HashMap<>());
+        indyProofRequest.setNonRevoked(indyProofRequestNonRevoked);
 
         presentationCreateRequestRequest.setProofRequest(indyProofRequest);
 

@@ -6,16 +6,10 @@ COPY pom.xml mvnw mvnw.cmd /build/
 
 RUN mvn -N io.takari:maven:wrapper
 
-COPY lib /build/lib/
 COPY src /build/src/
-COPY scripts /build/scripts
-
-# ToDo - BKAACMGT-188
-RUN chmod u+x ./scripts/resolve-acapy-client-dependency.sh
-RUN ./scripts/resolve-acapy-client-dependency.sh
 
 # Modified for OS
-RUN mvn package -Dmaven.test.skip=true -DembeddedMongodbMode=test
+RUN mvn package -Dmaven.test.skip=true
 
 FROM adoptopenjdk/openjdk11:alpine-jre
 

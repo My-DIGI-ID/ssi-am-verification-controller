@@ -1,9 +1,10 @@
 package com.bka.ssi.controller.verification.company.services.scripts.acapy;
 
-import com.bka.ssi.controller.verification.acapy_client.api.PresentProofV10Api;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationCreateRequestRequest;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationExchange;
-import com.bka.ssi.controller.verification.acapy_client.model.V10PresentationExchange.VerifiedEnum;
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.Base64;
+import java.util.List;
+
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration;
 import com.bka.ssi.controller.verification.company.services.VerificationService;
@@ -16,28 +17,28 @@ import com.bka.ssi.controller.verification.company.services.models.common.Connec
 import com.bka.ssi.controller.verification.company.services.models.credentials.GuestCredential;
 import com.bka.ssi.controller.verification.company.services.repositories.GuestVerificationRepository;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.dto.input.ACAPYPresentProofDto;
+import com.bka.ssi.controller.verification.company.services.scripts.acapy.tasks.GuestTaskScheduler;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYConnectionlessProofUtility;
 import com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities.ACAPYUtilities;
 import com.bka.ssi.controller.verification.company.services.system.accreditation.AccreditationClient;
 import com.bka.ssi.controller.verification.company.services.system.accreditation.dto.output.GuestAccreditationPrivateOutputDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.util.Base64;
-import java.util.List;
+import io.github.my_digi_id.acapy_client.api.PresentProofV10Api;
+import io.github.my_digi_id.acapy_client.model.V10PresentationCreateRequestRequest;
+import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 
 @Service
-public class GuestVerificationService
-    implements VerificationService<GuestVerification> {
+public class GuestVerificationService implements VerificationService<GuestVerification> {
 
     /*
-        Technical Debt: apply same pattern as in accreditation controller and implment
-        ACAPYClientV6 in infra layer and use here or in utilities
+     * Technical Debt: apply same pattern as in accreditation controller and
+     * implment ACAPYClientV6 in infra layer and use here or in utilities
      */
 
     @Value("${guest.checkoutDelay}")
@@ -51,16 +52,13 @@ public class GuestVerificationService
     private final CredentialsConfiguration credentialsConfiguration;
     private final ACAPYUtilities acapyUtilities;
     private final PresentProofV10Api presentProofApi;
+    private final GuestTaskScheduler taskScheduler;
 
-    public GuestVerificationService(
-        ACAPYConnectionlessProofUtility acapyConnectionlessProofUtility,
-        Logger logger,
-        ACAPYConfiguration acapyConfiguration,
-        AccreditationClient accreditationClient,
-        @Qualifier("guestVerificationMongoDbFacade")
-            GuestVerificationRepository verificationRepository,
-        CredentialsConfiguration credentialsConfiguration,
-        ACAPYUtilities acapyUtilities) {
+    public GuestVerificationService(ACAPYConnectionlessProofUtility acapyConnectionlessProofUtility, Logger logger,
+            ACAPYConfiguration acapyConfiguration, AccreditationClient accreditationClient,
+            @Qualifier("guestVerificationMongoDbFacade") GuestVerificationRepository verificationRepository,
+            CredentialsConfiguration credentialsConfiguration, ACAPYUtilities acapyUtilities,
+            GuestTaskScheduler guestTaskScheduler) {
         this.acapyConnectionlessProofUtility = acapyConnectionlessProofUtility;
         this.repository = verificationRepository;
         this.logger = logger;
@@ -68,6 +66,7 @@ public class GuestVerificationService
         this.accreditationClient = accreditationClient;
         this.credentialsConfiguration = credentialsConfiguration;
         this.acapyUtilities = acapyUtilities;
+        this.taskScheduler = guestTaskScheduler;
 
         this.presentProofApi = new PresentProofV10Api(this.acapyConfiguration.getApiClient());
     }
@@ -76,34 +75,32 @@ public class GuestVerificationService
     public URI handleProofRequest(String locationId, String terminalId) throws Exception {
         logger.info("start: handleProofRequest");
 
-        V10PresentationCreateRequestRequest presentationCreateRequestRequest =
-            acapyUtilities.createPresentationRequest(
-                "Test",
-                false,
-                "Basis-Id proof request",
-                this.credentialsConfiguration.getGuestProofCredSpec());
+        V10PresentationCreateRequestRequest presentationCreateRequestRequest = acapyUtilities.createPresentationRequest(
+                "Test", false, "Basis-Id proof request", this.credentialsConfiguration.getGuestProofCredSpec());
 
         logger.info(presentationCreateRequestRequest.toString());
 
-        V10PresentationExchange presentationExchange =
-            this.acapyConnectionlessProofUtility.getProofRequest(presentationCreateRequestRequest);
+        V10PresentationExchange presentationExchange = this.acapyConnectionlessProofUtility
+                .getProofRequest(presentationCreateRequestRequest);
 
         logger.info(presentationExchange.toString());
         // Store initial entries for thread_id in DB entry
-        GuestVerification verification = new GuestVerification(presentationExchange.getThreadId(),
-            locationId, terminalId);
+        GuestVerification verification = new GuestVerification(presentationExchange.getThreadId(), locationId,
+                terminalId);
         GuestVerification savedVerification = repository.save(verification);
         logger.info(savedVerification.getThreadId());
 
         // Build URI from presentation exchange
-        ConnectionlessProofRequest connectionlessProofRequest =
-            acapyUtilities.createConnectionlessProofRequest(presentationExchange);
+        ConnectionlessProofRequest connectionlessProofRequest = acapyUtilities
+                .createConnectionlessProofRequest(presentationExchange);
 
         ObjectMapper mapper = new ObjectMapper();
         logger.debug(mapper.writeValueAsString(connectionlessProofRequest));
         // Base64 encode the connectionless proof request
         String encodedUrl = Base64.getEncoder()
-            .encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
+                .encodeToString((mapper.writeValueAsString(connectionlessProofRequest)).getBytes());
+
+        taskScheduler.scheduleGuestVerificationTimeout(savedVerification.getId());
 
         logger.info("end: handleProofRequest");
         // return a URI that is consumable by the wallet app
@@ -111,12 +108,10 @@ public class GuestVerificationService
     }
 
     @Override
-    public void handlePresentationAcknowledged(ACAPYPresentProofDto inputDto)
-        throws NotFoundException {
+    public void handlePresentationAcknowledged(ACAPYPresentProofDto inputDto) throws NotFoundException {
         String threadId = inputDto.getThreadId();
 
-        GuestVerification verification = repository.findByThreadId(threadId).orElseThrow(
-            NotFoundException::new);
+        GuestVerification verification = repository.findByThreadId(threadId).orElseThrow(NotFoundException::new);
 
         verification.setProofState(inputDto.getState());
 
@@ -129,21 +124,22 @@ public class GuestVerificationService
         String presentationExchangeId = inputDto.getPresentationExchangeId();
 
         GuestVerification verification = repository.findByThreadId(inputDto.getThreadId())
-            .orElseThrow(NotFoundException::new);
+                .orElseThrow(NotFoundException::new);
 
-        V10PresentationExchange presentationExchange =
-            presentProofApi.presentProofRecordsPresExIdGet(presentationExchangeId);
+        V10PresentationExchange presentationExchange = presentProofApi
+                .presentProofRecordsPresExIdGet(presentationExchangeId);
 
         BasisId basisId = acapyUtilities.getBasisId(presentationExchange);
         verification.setBasisId(basisId);
 
         GuestCredential guestCredential = acapyUtilities.getGuestCredential(presentationExchange);
+        logger.debug("Guest Cred FirstName: " + guestCredential.getFirstName());
         verification.setGuestCredential(guestCredential);
 
         verification.setProofState(inputDto.getState());
 
         boolean basisIdVerified = presentationExchange.getVerified() != null
-            && VerifiedEnum.TRUE == presentationExchange.getVerified();
+                && V10PresentationExchange.VerifiedEnum.TRUE == presentationExchange.getVerified();
 
         if (acapyConfiguration.getBasisIdVerificationDevMode()) {
             logger.warn("Warning! Fallback to basisId verification dev mode");
@@ -158,14 +154,16 @@ public class GuestVerificationService
                 verification.setState(GuestVerificationStatus.FAIL_DATE_TIME);
                 repository.save(verification);
                 return;
+            } else if (!verification.getLocationId().equals(guestCredential.getLocation())) {
+                verification.setState(GuestVerificationStatus.FAIL_LOCATION);
+                repository.save(verification);
+                return;
             }
 
-            GuestAccreditationPrivateOutputDto guestAccreditation =
-                accreditationClient.getUniqueAccreditation(guestCredential.getReferenceBasisId(),
-                    guestCredential.getFirstName(), guestCredential.getLastName(),
-                    guestCredential.getDateOfBirth(), guestCredential.getCompanyName(),
-                    guestCredential.getValidFrom(), guestCredential.getValidUntil(),
-                    guestCredential.getInvitedBy());
+            GuestAccreditationPrivateOutputDto guestAccreditation = accreditationClient.getUniqueAccreditation(
+                    guestCredential.getReferenceBasisId(), guestCredential.getFirstName(),
+                    guestCredential.getLastName(), guestCredential.getDateOfBirth(), guestCredential.getCompanyName(),
+                    guestCredential.getValidFrom(), guestCredential.getValidUntil(), guestCredential.getInvitedBy());
 
             if (guestAccreditation == null) {
                 throw new NotFoundException();
@@ -173,34 +171,33 @@ public class GuestVerificationService
 
             verification.setAccreditationId(guestAccreditation.getId());
 
-            GuestVerification previousVerification =
-                repository.findByAccreditationId(guestAccreditation.getId())
+            GuestVerification previousVerification = repository.findByAccreditationId(guestAccreditation.getId())
                     .orElse(null);
 
             // Check-in
-            if (previousVerification == null || previousVerification.getCheckInDateTime() == null) {
+            if ((previousVerification == null || previousVerification.getCheckInDateTime() == null)
+                    && verification.getState() == GuestVerificationStatus.PENDING) {
 
-                verification.setCheckInDateTime(ZonedDateTime.now());
-
-                verification.setState(GuestVerificationStatus.CHECK_IN);
+                verification.checkIn();
 
                 repository.save(verification);
+
+                accreditationClient.updateAccreditation(verification.getAccreditationId(),
+                        GuestVerificationStatus.CHECK_IN);
 
                 presentProofApi.presentProofRecordsPresExIdDelete(presentationExchangeId);
 
-            } else if (isCheckoutDelayOver(
-                previousVerification.getCheckInDateTime())) { // Check-out
+            } else if (isCheckoutDelayOver(previousVerification.getCheckInDateTime())
+                    && verification.getState() == GuestVerificationStatus.PENDING) { //
+                // Check-out
 
                 verification.setCheckInDateTime(previousVerification.getCheckInDateTime());
-                verification.setCheckOutDateTime(ZonedDateTime.now());
 
-                verification.setState(GuestVerificationStatus.CHECK_OUT);
+                verification.checkOut();
 
                 repository.save(verification);
 
-                accreditationClient.revokeAccreditation(verification.getAccreditationId());
-
-                accreditationClient.cleanupAccreditation(verification.getAccreditationId());
+                revokeAndCleanupAccreditation(verification);
 
                 repository.deleteById(previousVerification.getId());
 
@@ -208,8 +205,8 @@ public class GuestVerificationService
             }
 
         } else {
-            logger.info("Guest " + guestCredential.getFirstName() + " "
-                + guestCredential.getLastName() + " failed verification.");
+            logger.info("Guest " + guestCredential.getFirstName() + " " + guestCredential.getLastName()
+                    + " failed verification.");
 
             verification.setState(GuestVerificationStatus.FAIL_VERIFY_CREDENTIAL);
 
@@ -218,22 +215,20 @@ public class GuestVerificationService
     }
 
     @Override
-    public List<GuestVerification> handleVerificationProcessComplete(String locationId,
-        String terminalId) {
+    public List<GuestVerification> handleVerificationProcessComplete(String locationId, String terminalId) {
         return this.repository.findAllByLocationIdAndTerminalId(locationId, terminalId);
     }
 
     public GuestVerification checkout(String verificationId) throws Exception {
-        GuestVerification previousVerification =
-            this.repository.findById(verificationId).orElseThrow(NotFoundException::new);
+        GuestVerification previousVerification = this.repository.findById(verificationId)
+                .orElseThrow(NotFoundException::new);
 
         if (previousVerification.getState() != GuestVerificationStatus.CHECK_IN) {
             throw new InvalidVerificationStateChangeException(
-                "Expected CHECK_IN but was " + previousVerification.getState());
+                    "Expected CHECK_IN but was " + previousVerification.getState());
         }
 
-        GuestVerification verification =
-            new GuestVerification(previousVerification.getLocationId(),
+        GuestVerification verification = new GuestVerification(previousVerification.getLocationId(),
                 previousVerification.getTerminalId());
 
         verification.setBasisId(previousVerification.getBasisId());
@@ -242,15 +237,12 @@ public class GuestVerificationService
         verification.setAccreditationId(previousVerification.getAccreditationId());
 
         verification.setCheckInDateTime(previousVerification.getCheckInDateTime());
-        verification.setCheckOutDateTime(ZonedDateTime.now());
 
-        verification.setState(GuestVerificationStatus.CHECK_OUT);
+        verification.checkOut();
 
         GuestVerification savedVerification = this.repository.save(verification);
 
-        this.accreditationClient.revokeAccreditation(verification.getAccreditationId());
-
-        this.accreditationClient.cleanupAccreditation(verification.getAccreditationId());
+        revokeAndCleanupAccreditation(verification);
 
         this.repository.deleteById(previousVerification.getId());
 
@@ -263,8 +255,7 @@ public class GuestVerificationService
         ZonedDateTime validFrom = guestCredential.getValidFrom();
         ZonedDateTime validUntil = guestCredential.getValidUntil();
 
-        return currentDate.isAfter(validFrom)
-            && currentDate.isBefore(validUntil);
+        return currentDate.isAfter(validFrom) && currentDate.isBefore(validUntil);
     }
 
     private boolean isCheckoutDelayOver(ZonedDateTime checkInDateTime) {
@@ -274,5 +265,10 @@ public class GuestVerificationService
         ZonedDateTime currentDate = ZonedDateTime.now();
 
         return currentDate.isAfter(delayEndDate);
+    }
+
+    private void revokeAndCleanupAccreditation(GuestVerification verification) throws Exception {
+        accreditationClient.revokeAccreditation(verification.getAccreditationId());
+        accreditationClient.cleanupAccreditation(verification.getAccreditationId());
     }
 }

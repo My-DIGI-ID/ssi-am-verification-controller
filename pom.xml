@@ -48,9 +48,9 @@
             <version>1.5.9</version>
         </dependency>
         <dependency>
-            <groupId>com.bka.ssi.controller</groupId>
-            <artifactId>verification.acapy-client</artifactId>
-            <version>0.6.0</version>
+            <groupId>io.github.my-digi-id</groupId>
+            <artifactId>acapy-client</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>me.paulschwarz</groupId>

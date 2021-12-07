@@ -2,6 +2,7 @@ package com.bka.ssi.controller.verification.company.infra.system.accreditation;
 
 import com.bka.ssi.controller.verification.company.aop.configuration.system.AccreditationConfiguration;
 import com.bka.ssi.controller.verification.company.infra.system.accreditation.exception.AccreditationSSLException;
+import com.bka.ssi.controller.verification.company.services.enums.GuestVerificationStatus;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthenticatedException;
 import com.bka.ssi.controller.verification.company.services.exceptions.UnauthorizedException;
 import com.bka.ssi.controller.verification.company.services.system.accreditation.AccreditationClient;
@@ -185,6 +186,52 @@ public class AccreditationHttpClient implements AccreditationClient {
         String url = accreditationConfiguration.getAccreditationApiUrl()
             + "/api/v2/accreditation/guest/revoke/checkout/"
             + accreditationId;
+
+        try {
+            ResponseEntity<GuestAccreditationOpenOutputDto> response =
+                new RestTemplate(this.requestFactory).exchange(
+                    url,
+                    HttpMethod.PATCH,
+                    entity,
+                    GuestAccreditationOpenOutputDto.class);
+
+            if (response
+                .getStatusCode()
+                .equals(HttpStatus.OK) && response.hasBody()) {
+                return response.getBody();
+            }
+        } catch (HttpClientErrorException.Unauthorized e) {
+            /* ToDo - handle exceptions outside of client - restTemplate ErrorHandler interferes
+                with RestControllerAdvice */
+            logger.error(e.getMessage());
+            throw new UnauthenticatedException();
+        } catch (HttpClientErrorException.Forbidden e) {
+            /* ToDo - handle exceptions outside of client - restTemplate ErrorHandler interferes
+                with RestControllerAdvice */
+            logger.error(e.getMessage());
+            throw new UnauthorizedException();
+        }
+
+        return null;
+    }
+
+    @Override
+    public GuestAccreditationOpenOutputDto updateAccreditation(String accreditationId,
+        GuestVerificationStatus status) throws Exception {
+        logger.debug("Updating accreditation ");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(accreditationConfiguration.getAccreditationApiKeyHeaderName(),
+            accreditationConfiguration.getAccreditationApiKey());
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        String url = accreditationConfiguration.getAccreditationApiUrl()
+            + "/api/v2/accreditation/guest/update/"
+            + accreditationId
+            + "?status="
+            + status.getName();
 
         try {
             ResponseEntity<GuestAccreditationOpenOutputDto> response =

@@ -1,6 +1,6 @@
 # SSI AM Verification Controller
 
-## ACAPY client library
+## ACAPY client library (DEPRECATED)
 
 Current generated ACAPY client library is based on `verification-acapy-openapi.v2.json`.
 

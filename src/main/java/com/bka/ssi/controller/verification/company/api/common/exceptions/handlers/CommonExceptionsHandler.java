@@ -1,6 +1,6 @@
 package com.bka.ssi.controller.verification.company.api.common.exceptions.handlers;
 
-import com.bka.ssi.controller.verification.company.api.common.exceptions.LogOutput;
+import com.bka.ssi.controller.verification.company.aop.logging.LoggingUtility;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.RestErrorResponse;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.factories.RestErrorResponseFactory;
 import com.bka.ssi.controller.verification.company.services.exceptions.NotFoundException;
@@ -41,8 +41,7 @@ public class CommonExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -58,8 +57,7 @@ public class CommonExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
@@ -75,8 +73,7 @@ public class CommonExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -91,8 +88,7 @@ public class CommonExceptionsHandler {
             request
         );
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -105,8 +101,7 @@ public class CommonExceptionsHandler {
             "message.common.rest.error.not_found_exception_placeholder",
             HttpStatus.NOT_FOUND, request);
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

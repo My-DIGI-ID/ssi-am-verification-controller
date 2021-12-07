@@ -1,6 +1,6 @@
 package com.bka.ssi.controller.verification.company.api.common.rest.exceptions.handlers;
 
-import com.bka.ssi.controller.verification.company.api.common.exceptions.LogOutput;
+import com.bka.ssi.controller.verification.company.aop.logging.LoggingUtility;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.RestErrorResponse;
 import com.bka.ssi.controller.verification.company.api.common.exceptions.response.factories.RestErrorResponseFactory;
 import com.bka.ssi.controller.verification.company.api.common.rest.controllers.AdminController;
@@ -39,8 +39,7 @@ public class AdminExceptionsHandler {
             "message.common.rest.error.json_parse_exception_placeholder",
             HttpStatus.INTERNAL_SERVER_ERROR, request);
 
-        logger.debug(ex.getMessage());
-        logger.error(new LogOutput(response).toString());
+        LoggingUtility.logRestErrorResponse(logger, response, ex);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
