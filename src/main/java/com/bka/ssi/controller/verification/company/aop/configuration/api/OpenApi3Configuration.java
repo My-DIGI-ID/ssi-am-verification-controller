@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.aop.configuration.api;
 
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
@@ -18,6 +34,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
+/**
+ * The type Open api 3 configuration.
+ */
 @Configuration
 public class OpenApi3Configuration {
 
@@ -28,6 +47,13 @@ public class OpenApi3Configuration {
     private final ACAPYConfiguration acapyConfiguration;
     private final SSOConfiguration ssoConfiguration;
 
+    /**
+     * Instantiates a new Open api 3 configuration.
+     *
+     * @param infoConfiguration  the info configuration
+     * @param acapyConfiguration the acapy configuration
+     * @param ssoConfiguration   the sso configuration
+     */
     public OpenApi3Configuration(
         InfoConfiguration infoConfiguration,
         ACAPYConfiguration acapyConfiguration,
@@ -37,6 +63,11 @@ public class OpenApi3Configuration {
         this.ssoConfiguration = ssoConfiguration;
     }
 
+    /**
+     * Open api open api.
+     *
+     * @return the open api
+     */
     @Bean
     public OpenAPI openAPI() {
         /* ToDo - redefine ID_PROVIDER_PERMISSIONS_PATH and ID_PROVIDER_TOKEN_PATH to fit a broad

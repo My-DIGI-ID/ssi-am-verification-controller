@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.services.scripts.acapy.webhooks;
 
 import com.bka.ssi.controller.verification.company.services.exceptions.NotFoundException;
@@ -12,6 +28,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * The type Webhook service factory.
+ */
 @Component
 public class WebhookServiceFactory {
 
@@ -23,6 +42,15 @@ public class WebhookServiceFactory {
     private final GuestVerificationRepository guestVerificationRepository;
     private final EmployeeVerificationRepository employeeVerificationRepository;
 
+    /**
+     * Instantiates a new Webhook service factory.
+     *
+     * @param logger                             the logger
+     * @param guestVerificationWebhookService    the guest verification webhook service
+     * @param employeeVerificationWebhookService the employee verification webhook service
+     * @param guestVerificationRepository        the guest verification repository
+     * @param employeeVerificationRepository     the employee verification repository
+     */
     public WebhookServiceFactory(Logger logger,
         GuestVerificationWebhookService guestVerificationWebhookService,
         EmployeeVerificationWebhookService employeeVerificationWebhookService,
@@ -58,6 +86,12 @@ public class WebhookServiceFactory {
         throw new NotFoundException();
     }
 
+    /**
+     * Handle on present proof.
+     *
+     * @param inputDto the input dto
+     * @throws Exception the exception
+     */
     public void handleOnPresentProof(ACAPYPresentProofDto inputDto) throws Exception {
         WebhookService webhookService = getWebhookServiceByThreadId(inputDto.getThreadId());
 

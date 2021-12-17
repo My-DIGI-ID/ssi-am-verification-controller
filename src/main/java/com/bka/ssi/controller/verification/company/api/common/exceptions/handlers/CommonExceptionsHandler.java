@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.api.common.exceptions.handlers;
 
 import com.bka.ssi.controller.verification.company.aop.logging.LoggingUtility;
@@ -16,6 +32,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * The type Common exceptions handler.
+ */
 @RestControllerAdvice(basePackages = {"com.bka.ssi.controller.verification.company.api"})
 @Priority(1)
 public class CommonExceptionsHandler {
@@ -23,12 +42,25 @@ public class CommonExceptionsHandler {
     private final RestErrorResponseFactory restErrorResponseFactory;
     private final Logger logger;
 
+    /**
+     * Instantiates a new Common exceptions handler.
+     *
+     * @param restErrorResponseFactory the rest error response factory
+     * @param logger                   the logger
+     */
     public CommonExceptionsHandler(RestErrorResponseFactory restErrorResponseFactory,
         Logger logger) {
         this.restErrorResponseFactory = restErrorResponseFactory;
         this.logger = logger;
     }
 
+    /**
+     * Handle unsupported operation exception.
+     *
+     * @param ex      the ex
+     * @param request the request
+     * @return the response entity
+     */
     @ExceptionHandler(UnsupportedOperationException.class)
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     public ResponseEntity<RestErrorResponse> handleUnsupportedOperationException(
@@ -45,6 +77,13 @@ public class CommonExceptionsHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 
+    /**
+     * Handle unauthorized exception.
+     *
+     * @param ex      the ex
+     * @param request the request
+     * @return the response entity
+     */
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<RestErrorResponse> handleUnauthorizedException(
@@ -61,6 +100,13 @@ public class CommonExceptionsHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     * Handle unauthenticated exception.
+     *
+     * @param ex      the ex
+     * @param request the request
+     * @return the response entity
+     */
     @ExceptionHandler(UnauthenticatedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<RestErrorResponse> handleUnauthenticatedException(
@@ -77,6 +123,13 @@ public class CommonExceptionsHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Handle unknown exception.
+     *
+     * @param ex      the ex
+     * @param request the request
+     * @return the response entity
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<RestErrorResponse> handleUnknownException(Exception ex,
@@ -92,6 +145,13 @@ public class CommonExceptionsHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handle not found exception.
+     *
+     * @param ex      the ex
+     * @param request the request
+     * @return the response entity
+     */
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<RestErrorResponse> handleNotFoundException(NotFoundException ex,

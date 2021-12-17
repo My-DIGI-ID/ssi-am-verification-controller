@@ -65,8 +65,16 @@
     "arriving": "Ankunftszeit",
     "departed": "Abgereist",
     "employee-verification": "Mitarbeiterverifizierung",
+    "guest-verification": "Gastverifizierung",
     "first-name": "Vorname",
     "go-to-guest-details-label": "Gastinformationen öffnen",
+    "guest-status": {
+      "accepted": "Angenommen",
+      "pending": "Ausstehend",
+      "cancelled": "Abgebrochen",
+      "check-in": "Eingecheckt",
+      "check-out": "Ausgecheckt"
+    },
     "invited-by": "Eingeladen von",
     "last-name": "Nachname",
     "leaving": "Abreisezeit",
@@ -74,6 +82,27 @@
     "no-data": "Keine Daten entsprechen Ihrer Auswahl",
     "select-date-label": "Bitte wählen Sie ein Datum aus:",
     "status": "Status",
-    "title": "Gästeübersicht"
+    "title": "Gästeübersicht",
+    "switch-title": "Zur Mitarbeiterübersicht wechseln"
+  },
+  "receptionist-cabinet-employee-component": {
+    "title": "Mitarbeiterübersicht",
+    "switch-title": "Zur Gastübersicht wechseln",
+    "employee-verification": "Mitarbeiterverifizierung",
+    "employee-ref-id": "Mitarbeiterreferenz",
+    "first-name": "Vorname",
+    "last-name": "Nachname",
+    "location": "Niederlassung",
+    "status": "Status",
+    "updated": "Updated",
+    "employee-status": {
+      "accepted": "Angenommen",
+      "pending": "Ausstehend",
+      "cancelled": "Abgebrochen",
+      "check-in": "Eingecheckt",
+      "check-out": "Ausgecheckt",
+      "verified": "Verified"
+    },
+    "no-data": "Keine Daten entsprechen Ihrer Auswahl"
   }
 }

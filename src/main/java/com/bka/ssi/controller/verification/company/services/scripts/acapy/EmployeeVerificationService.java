@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.services.scripts.acapy;
 
 import com.bka.ssi.controller.verification.company.aop.configuration.agents.ACAPYConfiguration;
@@ -24,6 +40,9 @@ import java.net.URI;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * The type Employee verification service.
+ */
 @Service
 public class EmployeeVerificationService
     implements
@@ -37,6 +56,16 @@ public class EmployeeVerificationService
     private final ACAPYUtilities acapyUtilities;
     private PresentProofV10Api presentProofApi;
 
+    /**
+     * Instantiates a new Employee verification service.
+     *
+     * @param acapyConnectionlessProofUtility the acapy connectionless proof utility
+     * @param repository                      the repository
+     * @param logger                          the logger
+     * @param acapyConfiguration              the acapy configuration
+     * @param credentialsConfiguration        the credentials configuration
+     * @param acapyUtilities                  the acapy utilities
+     */
     public EmployeeVerificationService(
         ACAPYConnectionlessProofUtility acapyConnectionlessProofUtility,
         @Qualifier("employeeVerificationMongoDbFacade") EmployeeVerificationRepository repository,
@@ -127,6 +156,9 @@ public class EmployeeVerificationService
         boolean verified = presentationExchange.getVerified() != null
             && V10PresentationExchange.VerifiedEnum.TRUE == presentationExchange.getVerified();
 
+        // TODO: checkIn currently without checkout; eliminate usage of getter and setter in
+        //  service and infra layer
+        verification.checkIn();
         if (verified) {
             verification.setState(EmployeeVerificationStatus.VERIFIED);
         } else {

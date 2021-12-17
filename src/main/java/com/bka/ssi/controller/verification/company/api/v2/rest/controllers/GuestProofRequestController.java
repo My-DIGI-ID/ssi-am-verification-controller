@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.api.v2.rest.controllers;
 
 import com.bka.ssi.controller.verification.company.api.mappers.GuestVerificationOutputDtoMapper;
@@ -26,6 +42,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The type Guest proof request controller.
+ */
 @Tag(name = "Proof request controller v2", description = "Handle proof requests from scanned QR codes")
 @RestController("proofRequestControllerV2")
 @RequestMapping("/api/v2/guest")
@@ -35,6 +54,13 @@ public class GuestProofRequestController {
     private final GuestVerificationOutputDtoMapper mapper;
     private final Logger logger;
 
+    /**
+     * Instantiates a new Guest proof request controller.
+     *
+     * @param guestVerificationService    the guest verification service
+     * @param verificationOutputDtoMapper the verification output dto mapper
+     * @param logger                      the logger
+     */
     GuestProofRequestController(GuestVerificationService guestVerificationService,
         GuestVerificationOutputDtoMapper verificationOutputDtoMapper,
         Logger logger) {
@@ -43,6 +69,14 @@ public class GuestProofRequestController {
         this.logger = logger;
     }
 
+    /**
+     * Get URI for redirect.
+     *
+     * @param locationId the location id
+     * @param terminalId the terminal id
+     * @return the response entity
+     * @throws Exception the exception
+     */
     @Operation(summary = "Get URI for redirect")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "307",
@@ -64,6 +98,14 @@ public class GuestProofRequestController {
         return new ResponseEntity<Void>(httpHeaders, HttpStatus.TEMPORARY_REDIRECT);
     }
 
+    /**
+     * Get List of verifications.
+     *
+     * @param locationId the location id
+     * @param terminalId the terminal id
+     * @return the response entity
+     * @throws Exception the exception
+     */
     /* TODO - BKAACMGT-165 - Currently content type of response is \*\/\* */
     @Operation(summary = "Get List of verifications",
         security = @SecurityRequirement(name = "oauth2_verification_api"))
@@ -90,6 +132,13 @@ public class GuestProofRequestController {
         return ResponseEntity.ok(outputDto);
     }
 
+    /**
+     * Checkout guest.
+     *
+     * @param verificationId the verification id
+     * @return the response entity
+     * @throws Exception the exception
+     */
     @Operation(summary = "Checkout guest",
         security = @SecurityRequirement(name = "oauth2_verification_api"))
     @ApiResponses(value = {

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.services.scripts.acapy.utilities;
 
 import static com.bka.ssi.controller.verification.company.aop.configuration.agents.CredentialsConfiguration.BASIS_ID_ATTRIBUTE_NAME;
@@ -86,6 +102,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The type Acapy utilities.
+ */
 @Component
 public class ACAPYUtilities {
 
@@ -98,6 +117,18 @@ public class ACAPYUtilities {
         this.acapyConfiguration = acapyConfiguration;
     }
 
+    /**
+     * Create presentation request v 10 presentation create request request.
+     *
+     * @param comment   the comment
+     * @param trace     the trace
+     * @param name      the name
+     * @param credSpecs the cred specs
+     * @return the v 10 presentation create request request
+     * @throws InvocationTargetException the invocation target exception
+     * @throws IllegalAccessException    the illegal access exception
+     * @throws NoSuchMethodException     the no such method exception
+     */
     public V10PresentationCreateRequestRequest createPresentationRequest(String comment,
         boolean trace, String name, Map<String,
         ProofRequestCredSpec> credSpecs)
@@ -155,6 +186,12 @@ public class ACAPYUtilities {
         return presentationCreateRequestRequest;
     }
 
+    /**
+     * Create connectionless proof request connectionless proof request.
+     *
+     * @param presentationExchange the presentation exchange
+     * @return the connectionless proof request
+     */
     public ConnectionlessProofRequest createConnectionlessProofRequest(
         V10PresentationExchange presentationExchange) {
 
@@ -193,6 +230,12 @@ public class ACAPYUtilities {
         return connectionlessProofRequest;
     }
 
+    /**
+     * Gets basis id.
+     *
+     * @param presentationExchange the presentation exchange
+     * @return the basis id
+     */
     public BasisId getBasisId(V10PresentationExchange presentationExchange) {
 
         Map<String, String> attributes = getRevealedAttributeGroup(presentationExchange,
@@ -207,6 +250,13 @@ public class ACAPYUtilities {
         return basisId;
     }
 
+    /**
+     * Gets guest credential.
+     *
+     * @param presentationExchange the presentation exchange
+     * @return the guest credential
+     * @throws ParseException the parse exception
+     */
     public GuestCredential getGuestCredential(V10PresentationExchange presentationExchange)
         throws ParseException {
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
@@ -248,6 +298,12 @@ public class ACAPYUtilities {
         return guestCredential;
     }
 
+    /**
+     * Gets employee credential.
+     *
+     * @param presentationExchange the presentation exchange
+     * @return the employee credential
+     */
     public EmployeeCredential getEmployeeCredential(V10PresentationExchange presentationExchange) {
 
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);

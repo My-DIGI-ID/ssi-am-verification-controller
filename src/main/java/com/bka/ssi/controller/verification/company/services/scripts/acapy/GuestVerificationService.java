@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.services.scripts.acapy;
 
 import java.net.URI;
@@ -33,6 +49,9 @@ import io.github.my_digi_id.acapy_client.api.PresentProofV10Api;
 import io.github.my_digi_id.acapy_client.model.V10PresentationCreateRequestRequest;
 import io.github.my_digi_id.acapy_client.model.V10PresentationExchange;
 
+/**
+ * The type Guest verification service.
+ */
 @Service
 public class GuestVerificationService implements VerificationService<GuestVerification> {
 
@@ -54,6 +73,18 @@ public class GuestVerificationService implements VerificationService<GuestVerifi
     private final PresentProofV10Api presentProofApi;
     private final GuestTaskScheduler taskScheduler;
 
+    /**
+     * Instantiates a new Guest verification service.
+     *
+     * @param acapyConnectionlessProofUtility the acapy connectionless proof utility
+     * @param logger                          the logger
+     * @param acapyConfiguration              the acapy configuration
+     * @param accreditationClient             the accreditation client
+     * @param verificationRepository          the verification repository
+     * @param credentialsConfiguration        the credentials configuration
+     * @param acapyUtilities                  the acapy utilities
+     * @param guestTaskScheduler              the guest task scheduler
+     */
     public GuestVerificationService(ACAPYConnectionlessProofUtility acapyConnectionlessProofUtility, Logger logger,
             ACAPYConfiguration acapyConfiguration, AccreditationClient accreditationClient,
             @Qualifier("guestVerificationMongoDbFacade") GuestVerificationRepository verificationRepository,
@@ -219,6 +250,13 @@ public class GuestVerificationService implements VerificationService<GuestVerifi
         return this.repository.findAllByLocationIdAndTerminalId(locationId, terminalId);
     }
 
+    /**
+     * Checkout guest verification.
+     *
+     * @param verificationId the verification id
+     * @return the guest verification
+     * @throws Exception the exception
+     */
     public GuestVerification checkout(String verificationId) throws Exception {
         GuestVerification previousVerification = this.repository.findById(verificationId)
                 .orElseThrow(NotFoundException::new);

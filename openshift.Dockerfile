@@ -20,8 +20,13 @@ RUN mkdir -p /app/resources/i18n/ui
 COPY --from=MAVEN_BUILD /build/target/verification.company-0.0.1-SNAPSHOT.jar /app/
 COPY --from=MAVEN_BUILD /build/src/main/resources/i18n/ui/* /app/resources/i18n/ui/
 
-# PDB - For OpenShift - nothing runs with ROOT 
-RUN chmod 777 -R /app && chmod 777 -R /app/* 
+# For OpenShift - nothing runs with ROOT 
+#RUN chmod -R u=rwx,g=rw,o=rw /app && chmod -R u=rwx,g=rw,o=rw /app/*
+RUN chgrp -R 0 /app && \
+    chmod -R g=u /app && \
+    chgrp -R 0 /app/* && \
+    chmod -R g=u /app/*
+
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "verification.company-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dlog4j2.formatMsgNoLookups=true","-jar", "verification.company-0.0.1-SNAPSHOT.jar"]

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.infra.db.mongo.mappers;
 
 import com.bka.ssi.controller.verification.company.infra.db.mongo.documents.EmployeeVerificationMongoDbDocument;
@@ -19,9 +35,18 @@ import com.bka.ssi.controller.verification.company.services.models.common.Positi
 import com.bka.ssi.controller.verification.company.services.models.credentials.EmployeeCredential;
 import org.springframework.stereotype.Component;
 
+/**
+ * The type Employee verification mongo db mapper.
+ */
 @Component
 public class EmployeeVerificationMongoDbMapper {
 
+    /**
+     * Entity to document employee verification mongo db document.
+     *
+     * @param verification the verification
+     * @return the employee verification mongo db document
+     */
     public EmployeeVerificationMongoDbDocument entityToDocument(EmployeeVerification verification) {
         if (verification == null) {
             return null;
@@ -113,11 +138,18 @@ public class EmployeeVerificationMongoDbMapper {
             }
 
             document.setEmployeeCredentialMongoDbValue(employeeCredentialMongoDbValue);
+            document.setCheckInDateTime(verification.getCheckInDateTime());
 
             return document;
         }
     }
 
+    /**
+     * Document to entity employee verification.
+     *
+     * @param document the document
+     * @return the employee verification
+     */
     public EmployeeVerification documentToEntity(EmployeeVerificationMongoDbDocument document) {
         if (document == null) {
             return null;
@@ -207,6 +239,7 @@ public class EmployeeVerificationMongoDbMapper {
             verification.setTerminalId(document.getTerminalId());
             verification.setState(EmployeeVerificationStatus.valueOf(document.getState()));
             verification.setProofState(document.getProofState());
+            verification.setCheckInDateTime(document.getCheckInDateTime());
 
             return verification;
         }

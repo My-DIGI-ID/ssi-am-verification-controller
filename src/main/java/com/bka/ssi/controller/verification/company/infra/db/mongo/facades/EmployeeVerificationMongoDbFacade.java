@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.infra.db.mongo.facades;
 
 import com.bka.ssi.controller.verification.company.infra.db.mongo.documents.EmployeeVerificationMongoDbDocument;
@@ -12,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The type Employee verification mongo db facade.
+ */
 @Service
 public class EmployeeVerificationMongoDbFacade implements EmployeeVerificationRepository {
 
@@ -19,6 +38,13 @@ public class EmployeeVerificationMongoDbFacade implements EmployeeVerificationRe
     private final EmployeeVerificationMongoDbMapper mapper;
     private final Logger logger;
 
+    /**
+     * Instantiates a new Employee verification mongo db facade.
+     *
+     * @param employeeVerificationMongoDbRepository the employee verification mongo db repository
+     * @param employeeVerificationMongoDbMapper     the employee verification mongo db mapper
+     * @param logger                                the logger
+     */
     public EmployeeVerificationMongoDbFacade(
         EmployeeVerificationMongoDbRepository employeeVerificationMongoDbRepository,
         EmployeeVerificationMongoDbMapper employeeVerificationMongoDbMapper, Logger logger) {

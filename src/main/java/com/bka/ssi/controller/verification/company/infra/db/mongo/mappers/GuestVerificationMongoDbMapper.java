@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Bundesrepublik Deutschland
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bka.ssi.controller.verification.company.infra.db.mongo.mappers;
 
 import com.bka.ssi.controller.verification.company.infra.db.mongo.documents.GuestVerificationMongoDbDocument;
@@ -9,10 +25,19 @@ import com.bka.ssi.controller.verification.company.services.models.common.BasisI
 import com.bka.ssi.controller.verification.company.services.models.credentials.GuestCredential;
 import org.springframework.stereotype.Component;
 
+/**
+ * The type Guest verification mongo db mapper.
+ */
 @Component
 /* TODO - Consider implicit mapping for reflected MongoDB Documents, then mapper is not needed */
 public class GuestVerificationMongoDbMapper {
 
+    /**
+     * Entity to document guest verification mongo db document.
+     *
+     * @param verification the verification
+     * @return the guest verification mongo db document
+     */
     public GuestVerificationMongoDbDocument entityToDocument(
         GuestVerification verification) {
         if (verification == null) {
@@ -84,6 +109,12 @@ public class GuestVerificationMongoDbMapper {
         }
     }
 
+    /**
+     * Document to entity guest verification.
+     *
+     * @param document the document
+     * @return the guest verification
+     */
     public GuestVerification documentToEntity(
         GuestVerificationMongoDbDocument document) {
         if (document == null) {

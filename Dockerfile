@@ -16,4 +16,4 @@ WORKDIR /app
 
 COPY --from=MAVEN_BUILD /build/target/verification.company-0.0.1-SNAPSHOT.jar /app/
 
-ENTRYPOINT ["java", "-jar", "verification.company-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dlog4j2.formatMsgNoLookups=true","-jar", "verification.company-0.0.1-SNAPSHOT.jar"]
